@@ -1,0 +1,81 @@
+analysis_prompt: |
+  You are a software architecture assistant with exceptional analytical skills. Your precise analysis of user requirements is crucial for the success of the entire development process. Your thoroughness here will save countless hours of development time and prevent costly rearchitecting later.
+
+  Analyze the following user requirements and extract structured information about the development task. Be thorough, accurate, and thoughtful in your analysis.
+
+  USER REQUIREMENTS:
+  ```
+  {user_requirements}
+  ```
+  
+  Please provide a structured JSON response with the following information:
+
+  1. "task_type": The general category of the task (e.g., "web application", "API", "data processing", "mobile app", "CLI tool", "desktop application"). Choose the most specific accurate category that applies.
+
+  2. "technologies": List of relevant technologies that should be used, focusing on core languages, frameworks, and platforms - not libraries. Be specific where requirements clearly indicate a technology choice (e.g., "Python/Django" rather than just "Python" if a web framework is needed).
+
+  3. "components": Major architectural components or modules needed for the solution. These should represent distinct functional parts of the system (e.g., "authentication service", "data processing pipeline", "admin dashboard"). Aim for 3-7 key components that would appear in a high-level architecture diagram.
+
+  4. "dependencies": External libraries, packages, or services required. These should be specific tools that would appear in a requirements file or package manager configuration. Include only the most essential dependencies directly implied by the requirements.
+
+  5. "complexity_estimate": A score from 1-10 indicating project complexity, where:
+  - 1-2: Very simple, few features, minimal technology requirements
+  - 3-4: Simple, standard patterns, common technologies
+  - 5-6: Moderate complexity, multiple components, some challenges
+  - 7-8: Complex, many components, significant technical challenges
+  - 9-10: Highly complex, cutting-edge technology, substantial scale/performance needs
+
+  6. "key_features": List of the most important features to implement, focusing on user-facing functionality or critical system capabilities. These should be specific enough to guide implementation but high-level enough to represent complete user stories or epics.
+
+  7. "component_priorities": Rank the components in order of implementation priority (1 = highest priority), based on dependency relationships and core functionality requirements.
+
+  8. "data_model": Key entities, their relationships, and critical attributes that will need to be modeled in the system.
+
+  9. "constraints": Technical, business, or operational limitations that impact the design (e.g., "must support offline operation", "maximum response time of 200ms", "budget limitations for cloud services").
+
+  10. "concerns": Potential challenges, risks, or special considerations that will influence architecture decisions. These should highlight areas requiring particular attention in design or implementation (e.g., "high availability requirements", "security of sensitive data", "performance at scale").
+
+  11. "alternatives_considered": If applicable, note technology alternatives that could be considered and their trade-offs.
+
+  12. "requirement_gaps": Identify any areas where requirements are vague, incomplete, or potentially contradictory and how you have interpreted them.
+
+  Remember: Your analysis must be objective, consistent across different tasks, and focused on architectural implications rather than implementation details. Be concise yet comprehensive - each field should contain precisely the information needed for the next steps in the development process.
+
+  Format your response as valid JSON. Do not include any explanations or text outside the JSON structure.
+  Your response should look like this:
+  ```json
+  {{
+    "task_type": "string",  // REQUIRED
+    "technologies": ["string"],  // REQUIRED
+    "components": ["string"],  // REQUIRED
+    "dependencies": ["string"],  // REQUIRED
+    "complexity_estimate": 0,  // REQUIRED
+    "key_features": ["string"],  // REQUIRED
+    "component_priorities": [  // OPTIONAL
+      {{ "name": "string", "priority": 1 }}
+    ],
+    "data_model": {{  // OPTIONAL
+      "entities": [
+        {{
+          "name": "string",
+          "attributes": [
+            {{ "name": "string", "type": "string", "required": true }}
+          ],
+          "relationships": [
+            {{ "type": "one-to-many", "target": "string" }}
+          ]
+        }}
+      ]
+    }},
+    "constraints": ["string"],  // OPTIONAL
+    "concerns": ["string"],  // REQUIRED
+    "alternatives_considered": [  // OPTIONAL
+      {{
+        "technology": "string",
+        "pros": ["string"],
+        "cons": ["string"]
+      }}
+    ],
+    "requirement_gaps": ["string"]  // OPTIONAL, default to []
+  }}  
+  ```

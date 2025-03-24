@@ -1,0 +1,35 @@
+breakdown_prompt: |
+  I have a software development task with the following requirements:
+        
+  ```
+  {requirements}
+  ```
+  
+  The complexity of this task has been estimated at {complexity}/10, which exceeds
+  our maximum allowed complexity of {max_complexity}/10.
+  
+  Please suggest how to break this down into TWO SEPARATE STAGES that could be
+  implemented sequentially, where each stage would be simpler than the original task.
+  
+  For each suggested stage:
+  1. Provide a clear name/title
+  2. List the specific requirements for that stage
+  3. Explain how this breakdown reduces complexity
+  4. Suggest a rough complexity estimate for each stage
+  
+  Format your response as a JSON object with the following structure:
+  {{
+      "stage1": {{
+          "name": "Stage 1 name",
+          "requirements": "Detailed requirements for stage 1",
+          "complexity_estimate": X,
+          "reasoning": "Why this stage is simpler"
+      }},
+      "stage2": {{
+          "name": "Stage 2 name",
+          "requirements": "Detailed requirements for stage 2",
+          "complexity_estimate": Y,
+          "reasoning": "Why this stage is simpler"
+      }},
+      "explanation": "Overall explanation of the breakdown strategy"
+  }}

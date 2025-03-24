@@ -1,4 +1,5 @@
 from src.core.task_analyzer import TaskAnalyzer
+import json
 
 
 def main():
@@ -10,12 +11,15 @@ def main():
 
     # Sample user requirements
     user_requirements = """
-    I need to build a web application for managing inventory. It should:
-    - Allow users to add, edit, and delete items
-    - Track inventory levels and send alerts for low stock
-    - Generate reports on inventory movement
-    - Support barcode scanning for quick entry
-    - Have a responsive design for mobile use
+    I need to build a simple inventory item catalog component that will be reused across multiple projects. The component should:
+    - Provide CRUD operations for basic inventory items (create, read, update, delete)
+    - Each item should have: ID, name, category, quantity, price, and description
+    - Support simple search and filtering by name and category
+    - Expose a clean REST API for other components to consume
+    - Be containerized with Docker for easy deployment
+    - Include basic authentication for API access
+    - Store data in SQLite for simplicity in this initial version but keep it usable later with different DB types
+    - No UI implementation required in this phase
     """
 
     print("Analyzing user requirements...")
@@ -23,27 +27,37 @@ def main():
     # Analyze the requirements
     task_info = analyzer.analyze_requirements(user_requirements)
 
-    # Display the results
-    print("\nTask Analysis Results:")
+    # Display the results in a cleaner format
+    print("\n== Task Analysis Results ==")
     print(f"Task Type: {task_info['task_type']}")
+
     print("\nSuggested Technologies:")
     for tech in task_info.get("technologies", []):
-        print(f"- {tech}")
+        print(f"• {tech}")
 
     print("\nRequired Components:")
     for component in task_info.get("components", []):
-        print(f"- {component}")
+        print(f"• {component}")
 
     print("\nKey Features:")
     for feature in task_info.get("key_features", []):
-        print(f"- {feature}")
+        print(f"• {feature}")
 
     print(f"\nComplexity Estimate: {task_info.get('complexity_estimate', 'N/A')}/10")
 
     if task_info.get("concerns"):
         print("\nPotential Concerns:")
         for concern in task_info["concerns"]:
-            print(f"- {concern}")
+            print(f"• {concern}")
+
+    # Show dependencies which are important for implementation
+    print("\nDependencies:")
+    for dependency in task_info.get("dependencies", []):
+        print(f"• {dependency}")
+
+    # Print full JSON output for reference
+    print("\n== Complete Analysis JSON ==")
+    print(json.dumps(task_info, indent=2))
 
 
 if __name__ == "__main__":
