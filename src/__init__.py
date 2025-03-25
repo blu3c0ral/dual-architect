@@ -4,5 +4,8 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-# Now you can access them with os.environ
-api_key = os.environ.get("LLM_API_KEY")
+
+# Define global providers keys
+generator_provider = os.getenv("GENERATOR_PROVIDER")
+validator_provider = os.getenv("VALIDATOR_PROVIDER")
+test_provider = os.getenv("TEST_PROVIDER")

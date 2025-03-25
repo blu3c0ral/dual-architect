@@ -15,7 +15,6 @@ import prometheus_client
 
 def setup_logger(
     name: str,
-    level: int = logging.INFO,
     log_file: Optional[str] = None,
     log_dir: str = "./logs",
     console_output: bool = True,
@@ -25,7 +24,6 @@ def setup_logger(
 
     Args:
         name: Name of the logger
-        level: Log level (DEBUG, INFO, etc.)
         log_file: Optional specific log file path
         log_dir: Directory for log files if log_file not specified
         console_output: Whether to output logs to console
@@ -33,6 +31,8 @@ def setup_logger(
     Returns:
         Configured logger
     """
+    level = os.environ.get("LOG_LEVEL", "INFO").upper()
+
     # Create log directory if needed
     if log_file is None:
         os.makedirs(log_dir, exist_ok=True)

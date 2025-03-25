@@ -1,5 +1,6 @@
 import json
-from typing import Dict, Any, List, Optional, Tuple
+import os
+from typing import Dict, Any
 
 from src.utils.prompt_loader import load_prompt
 from src.utils.logger import setup_logger
@@ -11,7 +12,7 @@ class TaskAnalyzer:
     Acts as the entry point for the dual-architect system.
     """
 
-    def __init__(self, llm_service=None, log_level="INFO"):
+    def __init__(self, llm_service=None):
         """
         Initialize the TaskAnalyzer.
 
@@ -20,8 +21,16 @@ class TaskAnalyzer:
         """
         from src.utils.llm_client import LLMInterface
 
-        self.llm_service = llm_service if llm_service else LLMInterface()
-        self.logger = setup_logger("task_analyzer", level=log_level)
+        provider = os.getenv(
+            "TASK_ANALYZER_PROVIDER", os.getenv("GENERATOR_PROVIDER", "openai").lower()
+        )
+
+        self.llm_service = (
+            llm_service if llm_service else LLMInterface(provider=provider)
+        )
+        self.logger = setup_logger("task_analyzer")
+
+        self.logger.info(f"TaskAnalyzer initialized with provider: {provider}")
 
     def analyze_requirements(self, user_requirements: str) -> Dict[str, Any]:
         """

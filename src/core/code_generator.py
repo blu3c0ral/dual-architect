@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 from src.utils.prompt_loader import load_prompt
 

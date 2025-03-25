@@ -43,7 +43,7 @@ class PipelineConfig:
             stages_to_run: List of stages to execute (defaults to all stages)
             retry_attempts: Number of retry attempts for each stage
             output_dir: Directory to save outputs
-            verbose: Whether to print detailed logs
+            verbose: Whether to print detailed logs. Currently not used.
             save_intermediate: Whether to save intermediate results
             max_complexity: Maximum allowed complexity score
             mode: Pipeline execution mode (standard, fast, thorough)
@@ -121,8 +121,7 @@ class Pipeline:
         self.config = config or PipelineConfig()
 
         # Set up logging
-        log_level = logging.DEBUG if self.config.verbose else logging.INFO
-        self.logger = setup_logger("pipeline_orchestrator", level=log_level)
+        self.logger = setup_logger("pipeline_orchestrator")
 
         # Initialize components (use defaults if not provided)
         self.task_analyzer = task_analyzer or TaskAnalyzer()

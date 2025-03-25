@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 # Set up logging for the module
 import src.utils.logger as setup_logger
 
-logger = setup_logger.setup_logger("llm_client", level="INFO")
+logger = setup_logger.setup_logger("llm_client")
 
 
 class Message:
@@ -542,6 +542,8 @@ class LLMInterface:
         provider: str = "openai",
         api_key: Optional[str] = None,
         model: Optional[str] = None,
+        system_message: Optional[str] = None,
+        temperature: float = 0.5,
     ):
         """
         Initialize the LLM interface.
@@ -551,16 +553,23 @@ class LLMInterface:
             api_key: API key for the selected provider
             model: Model identifier to use (provider-specific default if None)
         """
+        if not 0 <= temperature <= 1:
+            logger.warning(
+                f"Temperature {temperature} outside recommended range [0.0, 1.0], clamping."
+            )
+            temperature = max(0, min(temperature, 1))
+        self.temperature = temperature
         self.provider_name = provider.lower()
         self.provider = self._initialize_provider(provider, api_key, model)
         self.conversation = None
+        if system_message:
+            self._start_conversation(system_message)
 
     def _initialize_provider(
         self,
         provider: str,
         api_key: Optional[str],
         model: Optional[str],
-        temperature: float = 0.5,
     ) -> LLMProvider:
         """
         Initialize the appropriate provider based on the selection.
@@ -575,24 +584,26 @@ class LLMInterface:
         """
         if provider.lower() == "openai":
             return OpenAIProvider(
-                api_key=api_key, model=model or "gpt-4", temperature=temperature
+                api_key=api_key, model=model or "gpt-4", temperature=self.temperature
             )
         elif provider.lower() == "gemini":
             return GeminiProvider(
-                api_key=api_key, model=model or "gemini-pro", temperature=temperature
+                api_key=api_key,
+                model=model or "gemini-pro",
+                temperature=self.temperature,
             )
         elif provider.lower() == "claude":
             return ClaudeProvider(
                 api_key=api_key,
                 model=model or "claude-3-opus-20240229",
-                temperature=temperature,
+                temperature=self.temperature,
             )
         else:
             raise ValueError(
                 f"Unsupported provider: {provider}. Choose from 'openai', 'gemini', or 'claude'."
             )
 
-    def start_conversation(self, system_message: Optional[str] = None) -> None:
+    def _start_conversation(self, system_message: Optional[str] = None) -> None:
         """
         Start a new conversation with the LLM.
 
@@ -613,9 +624,8 @@ class LLMInterface:
             ValueError: If no conversation has been started
         """
         if not self.conversation:
-            raise ValueError(
-                "No conversation started. Call start_conversation() first."
-            )
+            self._start_conversation(system_message)
+            return
 
         self.conversation.set_system_message(system_message)
         logger.info("Updated system message in the current conversation")
@@ -635,9 +645,7 @@ class LLMInterface:
             ValueError: If use_conversation is True but no conversation has been started
         """
         if use_conversation and not self.conversation:
-            raise ValueError(
-                "No conversation started. Call start_conversation() first."
-            )
+            self._start_conversation()
 
         conversation = self.conversation if use_conversation else None
         return self.provider.query(prompt, conversation)
@@ -666,7 +674,11 @@ class LLMInterface:
         return self.conversation.get_messages()
 
     def switch_provider(
-        self, provider: str, api_key: Optional[str] = None, model: Optional[str] = None
+        self,
+        provider: str,
+        api_key: Optional[str] = None,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
     ) -> None:
         """
         Switch to a different LLM provider.
@@ -675,7 +687,10 @@ class LLMInterface:
             provider: The LLM provider to use ('openai', 'gemini', or 'claude')
             api_key: API key for the selected provider
             model: Model identifier to use (provider-specific default if None)
+            temperature: Optional temperature setting for the new provider
         """
+        if temperature:
+            self.temperature = temperature
         self.provider_name = provider.lower()
         self.provider = self._initialize_provider(provider, api_key, model)
         logger.info(f"Switched to {provider} provider")
